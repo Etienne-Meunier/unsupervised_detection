@@ -14,6 +14,7 @@ from .PWCNet.model_pwcnet import ModelPWCNet
 from data.davis2016_data_utils import Davis2016Reader
 from data.fbms_data_utils import FBMS59Reader
 from data.segtrackv2_data_utils import SegTrackV2Reader
+from ipdb import set_trace
 
 class AdversarialLearner(object):
     def __init__(self):

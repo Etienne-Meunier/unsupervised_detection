@@ -75,46 +75,48 @@ def _test_masks():
                   break
             # Now write images in the test folder
             for batch_num in range(inference['input_image'].shape[0]):
+                try :
+                    # select mask
+                    generated_mask = inference['gen_masks'][batch_num]
+                    gt_mask = inference['gt_masks'][batch_num]
+                    category = inference['img_fname'][batch_num].decode("utf-8").split('/')[-2]
 
-                # select mask
-                generated_mask = inference['gen_masks'][batch_num]
-                gt_mask = inference['gt_masks'][batch_num]
-                category = inference['img_fname'][batch_num].decode("utf-8").split('/')[-2]
+                    iou, out_mask = compute_IoU(gt_mask=gt_mask, pred_mask_f=generated_mask)
+                    mae = compute_mae(gt_mask=gt_mask, pred_mask_f=out_mask)
+                    try:
+                        CategoryIou[category].append(iou)
+                        CategoryMae[category].append(mae)
+                    except:
+                        CategoryIou[category] = [iou]
+                        CategoryMae[category] = [mae]
 
-                iou, out_mask = compute_IoU(gt_mask=gt_mask, pred_mask_f=generated_mask)
-                mae = compute_mae(gt_mask=gt_mask, pred_mask_f=out_mask)
-                try:
-                    CategoryIou[category].append(iou)
-                    CategoryMae[category].append(mae)
-                except:
-                    CategoryIou[category] = [iou]
-                    CategoryMae[category] = [mae]
+                    if FLAGS.generate_visualization:
+                        # Verbose image generation
+                        save_dir = os.path.join(FLAGS.test_save_dir, category)
+                        if not os.path.isdir(save_dir):
+                            os.mkdir(save_dir)
+                        filename = os.path.join(save_dir,
+                                                  "frame_{:08d}.png".format(len(CategoryIou[category])))
 
-                if FLAGS.generate_visualization:
-                    # Verbose image generation
-                    save_dir = os.path.join(FLAGS.test_save_dir, category)
-                    if not os.path.isdir(save_dir):
-                        os.mkdir(save_dir)
-                    filename = os.path.join(save_dir,
-                                              "frame_{:08d}.png".format(len(CategoryIou[category])))
+                        preprocessed_bgr = postprocess_image(inference['input_image'][batch_num])
+                        preprocessed_mask = postprocess_mask(out_mask)
 
-                    preprocessed_bgr = postprocess_image(inference['input_image'][batch_num])
-                    preprocessed_mask = postprocess_mask(out_mask)
+                        # Overlap images
+                        results = cv2.addWeighted(preprocessed_bgr, 0.5,
+                                                      preprocessed_mask, 0.4, 0)
+                        results = cv2.resize(results, (des_width, des_height))
 
-                    # Overlap images
-                    results = cv2.addWeighted(preprocessed_bgr, 0.5,
-                                                  preprocessed_mask, 0.4, 0)
-                    results = cv2.resize(results, (des_width, des_height))
+                        cv2.imwrite(filename, results)
 
-                    cv2.imwrite(filename, results)
-
-                    matlab_fname = os.path.join(save_dir,
-                                            'result_{}.mat'.format(len(CategoryIou[category])))
-                    sio.savemat(matlab_fname,
-                                {'flow':inference['gt_flow'][batch_num],
-                                 'img1':cv2.cvtColor(preprocessed_bgr, cv2.COLOR_BGR2RGB),
-                                 'pred_mask': out_mask, #inference['gen_masks'][batch_num],
-                                 'gt_mask': inference['gt_masks'][batch_num]} )
+                        matlab_fname = os.path.join(save_dir,
+                                                'result_{}.mat'.format(len(CategoryIou[category])))
+                        sio.savemat(matlab_fname,
+                                    {'flow':inference['gt_flow'][batch_num],
+                                     'img1':cv2.cvtColor(preprocessed_bgr, cv2.COLOR_BGR2RGB),
+                                     'pred_mask': out_mask, #inference['gen_masks'][batch_num],
+                                     'gt_mask': inference['gt_masks'][batch_num]} )
+                except Exception as e :
+                    print(f'Problem with batch {batch_num} : {e}')
                 i+=1
 
             progbar.update(step)
@@ -141,4 +143,5 @@ def main(argv):
     _test_masks()
 
 if __name__ == "__main__":
+    print(sys.argv)
     main(sys.argv)

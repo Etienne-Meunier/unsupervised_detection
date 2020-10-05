@@ -2,6 +2,7 @@ import numpy as np
 import os
 import tensorflow as tf
 from data.aug_flips import random_flip_images
+from ipdb import set_trace
 
 class DirectoryIterator(object):
     """
@@ -46,7 +47,8 @@ class DirectoryIterator(object):
         current_filenames = None
         current_annotations = None
         for string in components:
-            folder_name = string[0].split('/')[3]
+            #set_trace()
+            folder_name = string[0].split('/')[-2]
 
 
             if folder_name != current_experiment:
