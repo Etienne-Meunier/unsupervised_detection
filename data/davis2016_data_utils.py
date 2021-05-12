@@ -17,6 +17,7 @@ class DirectoryIterator(object):
                         'val' : 'ImageSets/480p/val.txt',
                         'trainval': 'ImageSets/480p/trainval.txt'}
         part_file = os.path.join(directory, name_division.get(part))
+        print(part_file)
         if not os.path.isfile(part_file):
             raise IOError("Partition file not found")
         self.components = np.loadtxt(part_file, dtype=np.str)
@@ -47,7 +48,6 @@ class DirectoryIterator(object):
         current_filenames = None
         current_annotations = None
         for string in components:
-            #set_trace()
             folder_name = string[0].split('/')[-2]
 
 

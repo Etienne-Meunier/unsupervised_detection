@@ -1,14 +1,13 @@
 import os
 import sys
 from argparse import Namespace
-sys.path.append(f'{os.environ["Codinria"]}/Contextual_GAN/')
+sys.path.append(f'{os.environ["Codinria"]}/unsupervised_detection/')
 from test_generator import main
 
-
 CKPT_FILE=f"{os.environ['Dataria']}/Models/Contextual_GAN/davis_best_model/model.best"
-DATASET_FILE=f"{os.environ['Dataria']}/Motion_Saliency_moving_camera_videos/" #Motion_Saliency_moving_camera_videos
+DATASET_FILE=f"{os.environ['Dataria']}/Daphne_110120/" #Motion_Saliency_moving_camera_videos
 PWC_CKPT_FILE='Not using for inference'#f"{os.environ['Dataria']}/Models/Contextual_GAN/pwc/checkpoint"
-OUTPUT_FILE = f"{os.environ['Dataria']}/Motion_Saliency_moving_camera_videos/Contextual_GAN"
+OUTPUT_FILE = f"{os.environ['Dataria']}/Daphne_110120/Analysis/Contextual_GAN_Selection"
 
 
 argvs = {

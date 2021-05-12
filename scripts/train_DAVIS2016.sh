@@ -2,7 +2,7 @@
 
 # Script to Train a model on the DAVIS 2016 dataset (https://davischallenge.org/index.html)
 
-python3 train.py 
+python3 train.py
 --flow_normalizer=80.0 \
 --epsilon=75.0 \
 --max_temporal_len=2 \
